@@ -23,15 +23,15 @@
                     <div class="col-md-6">
                         <div class="border p-3 my-3 position-relative" id="get-box">
                             <h6>Buscar registro</h6>
-                            <input type="number" id="inputGet1Id" class="form-control id-buscar" placeholder="ID a buscar">
-                            <button id="btnGet1" class="btn btn-primary position-absolute bottom-0 mb-3">Buscar</button>
+                            <input type="number" id="inputGetId" class="form-control id-buscar" placeholder="ID a buscar">
+                            <button id="btnGet" class="btn btn-primary position-absolute bottom-0 mb-3">Buscar</button>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="border p-3 my-3 position-relative" id="post-box">
                             <h6>Ingresar nuevo registro</h6>
-                            <input type="text" id="inputPostNombre" class="form-control my-1" placeholder="Nombre">
-                            <input type="text" id="inputPostApellido" class="form-control my-1" placeholder="Apellido">
+                            <input type="text" id="inputPostNombre" class="form-control my-1" placeholder="Nombre" oninput="areInputsValid()">
+                            <input type="text" id="inputPostApellido" class="form-control my-1" placeholder="Apellido" oninput="areInputsValid()">
                             <button id="btnPost" class="btn btn-success position-absolute bottom-0 mb-3" disabled>
                                 Agregar</button>
                         </div>
@@ -42,15 +42,15 @@
                         <div class="border p-3 my-3 position-relative" id="put-box">
                             <h6>Modificar registro</h6>
                             <input type="number" id="inputPutId" class="form-control"
-                                placeholder="ID del registro a modificar">
-                            <button id="btnPut" class="btn btn-warning position-absolute bottom-0 mb-3" disabled>
+                                placeholder="ID del registro a modificar" oninput="isInputValidModify()">
+                            <button id="btnModal" class="btn btn-warning position-absolute bottom-0 mb-3" data-bs-toggle="modal" data-bs-target="#dataModal" disabled>
                                 Modificar</button>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="border p-3 my-3 position-relative" id="delete-box">
                             <h6>Eliminar registro</h6>
-                            <input type="number" id="inputDelete" class="form-control" placeholder="ID a eliminar">
+                            <input type="number" id="inputDelete" class="form-control" placeholder="ID a eliminar" oninput="isInputValidDelete()">
                             <button id="btnDelete" class="btn btn-danger position-absolute bottom-0 mb-3" disabled>
                                 Borrar</button>
                         </div>
@@ -77,13 +77,13 @@
             <div class="modal-content">
                 <div class="modal-body">
                     <label for="inputPutNombre">Nombre:</label>
-                    <input type="text" id="inputPutNombre" class="form-control my-1">
+                    <input type="text" id="inputPutNombre" class="form-control my-1" oninput="areInputsValidModal()">
                     <label for="inputPutApellido">Apellido:</label>
-                    <input type="text" id="inputPutApellido" class="form-control my-1">
+                    <input type="text" id="inputPutApellido" class="form-control my-1" oninput="areInputsValidModal()">
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <button type="button" class="btn btn-primary" id="btnSendChanges" disabled>Guardar</button>
+                    <button type="button" class="btn btn-secondary" id="btnModalClose" data-bs-dismiss="modal">Cancelar</button>
                 </div>
             </div>
         </div>

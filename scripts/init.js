@@ -1,69 +1,218 @@
-const URL = 'https://654a38ebe182221f8d52c154.mockapi.io/users';
-const idSearch = document.querySelector('.id-buscar');
-const resultados = document.querySelector('#results')
-const btn1 = document.querySelector('#btnGet1')
+// API
+const USERS = 'https://65650f5ceb8bb4b70ef12fe5.mockapi.io/users';
 
-idSearch.addEventListener('input', ()=>{
+// Results
+const results = document.getElementById('results');
 
-    const URL_ID = `https://654a38ebe182221f8d52c154.mockapi.io/users/${idSearch.value}`;
-
-    if(idSearch.value>0){
-        fetch(URL_ID)
-        .then(response => response.json())
-        .then(data=>{
-            console.log(URL_ID)
-            
-            btn1.addEventListener('click', ()=>{
-                resultados.innerHTML = `
-                <div>${data.id}</div>
-                <div>${data.name}</div>
-                <div>${data.lastname}</div>
-                ` 
-            })
-    } )
-    }
-    else{
-
-            btn1.addEventListener('click', ()=>{
-                resultados.innerHTML = `
-                <div></div>
-                <div></div>
-                <div></div>
-                ` 
-            })
-    }
-
-})
-
-btn1.addEventListener('click', ()=>{
-if(idSearch.value == ''){
-    fetch(URL)
-    .then(response => response.json())
-    .then(datos => {
-        
-            resultados.innerHTML = `
-            <div>${datos[0].id}</div>
-            <div>${datos[0].name}</div>
-            <div>${datos[0].lastname}</div>
-
-            <div>${datos[1].id}</div>
-            <div>${datos[1].name}</div>
-            <div>${datos[1].lastname}</div>
-
-            <div>${datos[2].id}</div>
-            <div>${datos[2].name}</div>
-            <div>${datos[2].lastname}</div>
-
-            <div>${datos[3].id}</div>
-            <div>${datos[3].name}</div>
-            <div>${datos[3].lastname}</div>
-            
-            <div>${datos[4].id}</div>
-            <div>${datos[4].name}</div>
-            <div>${datos[4].lastname}</div>
-
-            ` 
-        
-    })
+// Alert
+const alertError = document.getElementById('alert-error');
+// Show alert function
+function showAlert() {
+    alertError.classList.add('show');
+    setTimeout(() => {
+        alertError.classList.remove('show')
+    }, 1000);
 }
-})
+
+
+// SEARCH RECORDS
+// Elements
+const inputGetId = document.getElementById("inputGetId");
+const btnGet = document.getElementById("btnGet");
+
+// Search users function
+function searchUsers() {
+    fetch(USERS)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("The request wasn't successful")
+            }
+            return response.json();
+        })
+        .then(data => {
+            results.innerHTML = '';
+            data.forEach(user => {
+                results.innerHTML += `<div class="p-1"><p>ID: ${user.id}</p><p>NAME: ${user.name}</p><p>LASTNAME: ${user.lastname}</p></div>`;
+            });
+        })
+        .catch(error => {
+            console.error(error);
+            showAlert(); 
+            results.value = '';
+        });
+    };
+    
+// Event listener search record
+btnGet.addEventListener('click', () => {
+    if (!inputGetId.value) {
+        searchUsers()
+    } else {
+        fetch(USERS + `/${inputGetId.value}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("The request wasn't successful")
+            }
+            return response.json()
+        })
+        .then(data => {
+            results.innerHTML = '';
+            results.innerHTML = `<div class="p-1"><p>ID: ${data.id}</p><p>NAME: ${data.name}</p><p>LASTNAME: ${data.lastname}</p></div>`
+            inputGetId.value = '';
+        })
+        .catch(error => {
+            console.error(error);
+            showAlert();
+            inputGetId.value = '';
+            results.value = '';
+        })
+    }
+});
+
+
+// REGISTER RECORD 
+// Elements
+const inputPostNombre = document.getElementById('inputPostNombre');
+const inputPostApellido = document.getElementById('inputPostApellido');
+const btnPost = document.getElementById('btnPost');
+
+// Register record function
+function registerRecord() {
+        const record = {
+            name: inputPostNombre.value,
+            lastname: inputPostApellido.value
+        }
+
+        fetch(USERS, {
+            method: 'POST',
+            body: JSON.stringify(record)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("The request wasn't successful")
+            }
+            return response.json()
+            })
+            .then(data => {
+                searchUsers();
+                inputPostNombre.value = '';
+                inputPostApellido.value = '';                
+            })
+            .catch(error => {
+                console.error(error);
+                showAlert();
+                inputPostNombre.value = '';
+                inputPostApellido.value = '';
+                results.value = '';
+            })
+};
+
+// Event listener register record
+function areInputsValid() {
+    if (inputPostNombre.value && inputPostApellido.value) {
+        btnPost.disabled = false;
+        btnPost.addEventListener("click", registerRecord)    
+    } else {
+        btnPost.disabled = true;
+        btnPost.removeEventListener("click", registerRecord);
+    }
+};
+
+// MODIFY RECORD
+// Elements
+const inputPutId = document.getElementById("inputPutId");
+const inputPutNombre = document.getElementById("inputPutNombre");
+const inputPutApellido = document.getElementById("inputPutApellido");
+
+const btnModal = document.getElementById("btnModal");
+const btnSendChanges = document.getElementById("btnSendChanges");
+const btnModalClose = document.getElementById("btnModalClose");
+
+// Is input valid modify function
+function isInputValidModify() {
+    if (inputPutId.value) {
+        btnModal.disabled = false;
+    } else {
+        btnModal.disabled = true;
+    }
+}
+
+// Are inputs valid modify function
+function areInputsValidModal() {
+    if (inputPutNombre.value && inputPutApellido.value) {
+        btnSendChanges.disabled = false;
+        btnSendChanges.addEventListener('click', modifyRegister)
+    } else {
+        btnSendChanges.disabled = true;
+        btnSendChanges.addEventListener('click', modifyRegister)
+    }
+};
+
+// Modify register function
+function modifyRegister() {
+    record = {
+        name: inputPutNombre.value,
+        lastname: inputPutApellido.value
+    };
+
+    fetch(USERS + `/${inputPutId.value}`, {
+        method: 'PUT',
+        body: JSON.stringify(record)
+    })
+    .then(response => {
+        console.log(response)
+        btnModal.click();
+        inputPutId.value = '';
+        if (!response.ok) {
+            throw new Error("The request wasn't successful")
+        }
+        return response.json()
+    })
+    .then(data => {
+        searchUsers();
+    })
+    .catch(error => {
+        console.error(error);
+        showAlert();
+        inputPutId.value = '';
+        results.value = '';
+    })
+};
+
+// DELETE RECORD
+// Elements
+const inputDelete = document.getElementById('inputDelete');
+const btnDelete = document.getElementById('btnDelete');
+
+// Is input valid delete function
+function isInputValidDelete() {
+    if (inputDelete.value) {
+        btnDelete.disabled = false;
+        btnDelete.addEventListener('click', deleteRecord) 
+    } else {
+        btnDelete.disabled = true;
+        btnDelete.removeEventListener('click', deleteRecord)
+    }
+};
+
+// Delete record function
+function deleteRecord() {
+    fetch(USERS + `/${inputDelete.value}`, {
+        method: 'DELETE',
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("The request wasn't successful")
+        }
+        return response.json()
+    })
+    .then(data => {
+        searchUsers();
+        inputDelete.value = '';
+    })
+    .catch(error => {
+        console.error(error);
+        showAlert();
+        inputDelete.value = '';
+        results.value = '';
+    })
+};
